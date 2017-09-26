@@ -1,24 +1,54 @@
 import React, { Component } from 'react';
-import { Layout, Menu, Breadcrumb } from 'antd';
+import { Layout, Menu, Icon } from 'antd';
 import './styles/App.css'
 import * as ReadableAPI from './utils/ReadableAPI'
 
 
 class App extends Component {
 
+  constructor(props) {
+    super(props)
+    this.state = {
+      categoriesList: [],
+      posts: []
+    }
+  }
+
   componentDidMount() {
     ReadableAPI.getCategories().then(categories => (
-      console.log(categories)
-    ))
-    ReadableAPI.getCategoryPosts('redux').then(catPosts => (
-      console.log(catPosts)
+      this.setState({
+        categoriesList: categories
+      })
     ))
     ReadableAPI.getPosts().then(posts => (
-      console.log(posts)
+      this.setState({ posts })
+    ))
+    ReadableAPI.getPostComments({id: "8xf0y6ziyjabvozdd253nd"}).then(comments => (
+      console.log(comments)
     ))
   }
+
+  convertTimestamp = (timestamp) => {
+    const date = new Date(timestamp)
+    const day = date.getDate()
+    const month = date.getMonth()
+    const formattedMonths = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+    const year = date.getFullYear()
+    const hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+    const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+    return `${year}/${formattedMonths[month]}/${day} - ${hours}:${minutes}`
+  }
+
+  commentsCount = (post) => {
+    ReadableAPI.getPostComments(post).then(comments => (
+      comments.length
+    ))
+  }
+
   render() {
     const { Header, Content, Footer } = Layout;
+    const { categoriesList, posts } = this.state;
+    console.log(posts)
     return (
       <div className="App">
         <Layout className="layout">
@@ -27,21 +57,29 @@ class App extends Component {
             <Menu
               theme="dark"
               mode="horizontal"
-              defaultSelectedKeys={['2']}
               style={{ lineHeight: '64px' }}
             >
-              <Menu.Item key="1">nav 1</Menu.Item>
-              <Menu.Item key="2">nav 2</Menu.Item>
-              <Menu.Item key="3">nav 3</Menu.Item>
+            {categoriesList.map((category, index) => (
+              <Menu.Item key={index}>{category.name}</Menu.Item>
+            ))}
             </Menu>
           </Header>
           <Content style={{ padding: '0 50px' }}>
-            <Breadcrumb style={{ margin: '12px 0' }}>
-              <Breadcrumb.Item>Home</Breadcrumb.Item>
-              <Breadcrumb.Item>List</Breadcrumb.Item>
-              <Breadcrumb.Item>App</Breadcrumb.Item>
-            </Breadcrumb>
-            <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>Content</div>
+            {posts.map(post => (
+              <div key={post.id} style={{ background: '#fff', padding: 24, minHeight: 80, marginTop: 24, display: 'flex' }}>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
+                  <Icon type="up" style={{ fontSize: 24, color: '#bbb' }}/>
+                  <span>{post.voteScore}</span>
+                  <Icon type="down" style={{ fontSize: 24, color: '#bbb' }}/>
+                </div>
+                <div style={{display: 'flex', flexDirection: 'column', margin: '0 2em'}}>
+                  <h2>{post.title}</h2>
+                  <small style={{textAlign: 'left'}}>Submitted {this.convertTimestamp(post.timestamp)} by {post.author}</small>
+                  <span style={{textAlign: 'left'}}>{this.commentsCount(post)} comments</span>
+                </div>
+              </div>
+            ))}
+
           </Content>
           <Footer style={{ textAlign: 'center' }}>
             Readable ©2017 by @danlaurent
