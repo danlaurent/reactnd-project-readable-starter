@@ -60,7 +60,7 @@ class App extends Component {
               style={{ lineHeight: '64px' }}
             >
             {categoriesList.map((category, index) => (
-              <Menu.Item key={index}>{category.name}</Menu.Item>
+              <Menu.Item key={index} style={{textTransform: 'capitalize'}}>{category.name}</Menu.Item>
             ))}
             </Menu>
           </Header>
