@@ -1,3 +1,9 @@
+import * as ReadableAPI from '../utils/ReadableAPI'
+
+export const GET_CATEGORIES = 'GET_CATEGORIES'
+export const GET_POSTS = 'GET_POSTS'
+export const GET_COMMENTS = 'GET_COMMENTS'
+
 export const CREATE_POST = 'CREATE_POST'
 export const VOTE_POST = 'VOTE_POST'
 export const EDIT_POST = 'EDIT_POST'
@@ -7,6 +13,51 @@ export const CREATE_COMMENT = 'CREATE_COMMENT'
 export const VOTE_COMMENT = 'VOTE_COMMENT'
 export const EDIT_COMMENT = 'EDIT_COMMENT'
 export const DELETE_COMMENT = 'DELETE_COMMENT'
+
+export function receiveCategories(data) {
+  return {
+    type: GET_CATEGORIES,
+    data
+  }
+}
+
+export const fetchCategories = () => dispatch => (
+  ReadableAPI.getCategories().then(categories => (
+    dispatch(receiveCategories(categories))
+  ))
+)
+
+export function receivePosts(posts) {
+  return {
+    type: GET_POSTS,
+    posts
+  }
+}
+
+export const fetchPosts = () => dispatch => (
+  ReadableAPI.getPosts().then(posts => (
+    dispatch(receivePosts(posts))
+  ))
+)
+
+export const fetchPost = (postId) => dispatch => (
+  ReadableAPI.getPost(postId).then(post => (
+    dispatch(receivePosts(post))
+  ))
+)
+
+export function receiveComments(comments) {
+  return {
+    type: GET_COMMENTS,
+    comments
+  }
+}
+
+export const fetchComments = (postId) => dispatch => (
+  ReadableAPI.getPostComments(postId).then(comments => (
+    dispatch(receiveComments(comments))
+  ))
+)
 
 export function addPost({id, timestamp, title, body, author, category}) {
   return {

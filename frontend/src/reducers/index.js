@@ -1,4 +1,7 @@
 import {
+  GET_CATEGORIES,
+  GET_POSTS,
+  GET_COMMENTS,
   CREATE_POST,
   EDIT_POST,
   VOTE_POST,
@@ -16,9 +19,24 @@ const initialReadableState = {
   comments: []
 }
 
-const post = (state = initialReadableState, action) => {
-  const {id, timestamp, title, body, author, category, option} = action
+const posts = (state = initialReadableState, action) => {
+  const {id, timestamp, title, body, author, category, option, posts, comments, data} = action
   switch (action.type) {
+    case GET_CATEGORIES:
+      return {
+        ...state,
+        categories: data
+      }
+    case GET_POSTS:
+      return {
+        ...state,
+        posts
+      }
+    case GET_COMMENTS:
+      return {
+        ...state,
+        comments
+      }
     case CREATE_POST:
       return {id, timestamp, title, body, author, category}
     case EDIT_POST:
@@ -32,7 +50,7 @@ const post = (state = initialReadableState, action) => {
         ...state,
         option
       }
-    case: DELETE_POST:
+    case DELETE_POST:
       return {
         id
       }
@@ -41,7 +59,7 @@ const post = (state = initialReadableState, action) => {
   }
 }
 
-const comment = (state = initialReadableState, action) => {
+const comments = (state = {}, action) => {
   const {id, timestamp, body, author, option, parentId} = action
   switch (action.type) {
     case CREATE_COMMENT:
@@ -57,7 +75,7 @@ const comment = (state = initialReadableState, action) => {
         ...state,
         option
       }
-    case: DELETE_COMMENT:
+    case DELETE_COMMENT:
       return {
         id
       }
@@ -67,6 +85,6 @@ const comment = (state = initialReadableState, action) => {
 }
 
 export default combineReducers({
-  post,
-  comment
+  posts,
+  comments
 })

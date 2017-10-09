@@ -32,8 +32,8 @@ export const createPost = (id, timestamp, title, body, author, category) =>
     body: JSON.stringify({ id, timestamp, title, body, author, category })
   }).then(res => res.json())
 
-export const getPost = (post) =>
-  fetch(`${api}/${post.id}`, { headers })
+export const getPost = (postId) =>
+  fetch(`${api}/posts/${postId}`, { headers })
     .then(res => res.json())
     .then(data => data)
 
@@ -57,8 +57,8 @@ export const deletePost = (post) =>
     headers: { ...headers, 'Content-Type': 'application/json' }
   }).then(res => res.json())
 
-export const getPostComments = (post) =>
-  fetch(`${api}/posts/${post.id}/comments`, { headers })
+export const getPostComments = (postId) =>
+  fetch(`${api}/posts/${postId}/comments`, { headers })
     .then(res => res.json())
     .then(data => data)
 
