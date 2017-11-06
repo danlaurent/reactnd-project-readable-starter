@@ -8,3 +8,7 @@ export const convertTimestamp = (timestamp) => {
   const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
   return `${year}/${formattedMonths[month]}/${day} - ${hours}:${minutes}`
 }
+
+export const generateId = () => (
+  Math.random().toString(36).substr(-8)
+)

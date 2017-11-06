@@ -1,59 +1,86 @@
 import React, { Component } from 'react'
 import { Form, Input, Select, Button } from 'antd'
 import { connect } from 'react-redux'
+import { newPost } from '../actions'
 
 class NewPost extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      id: '',
+      timestamp: new Date().getTime(),
+      title: '',
+      author: '',
+      message: '',
+      post_category: ''
+    }
+  }
 
   generateId = () => (
     Math.random().toString(36).substr(-8)
   )
 
   componentDidMount() {
-    this.generateId()
+    this.setState({
+      id: this.generateId(),
+      timestamp: new Date().getTime()
+    })
   }
 
   handleSubmit = (e) => {
     e.preventDefault()
-    console.log(e.target)
+    const { id, timestamp, title, message, author, post_category } = this.state
+    const { addPost } = this.props
+    addPost(id, timestamp, title, message, author, post_category)
+  }
+
+  handleChange = (e, dest, cont) => {
+    this.setState({
+      [dest]: cont
+    })
   }
 
   render() {
-    console.log(this.props)
-    const {posts} = this.props
+    const {forum} = this.props
     const formItemLayout = {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
     }
     return (
       <div style={{margin: '2em 0'}}>
-        <Form onSubmit={this.handleSubmit}>
-          <Input value={this.generateId()} type="hidden" readOnly />
-          <Input value={new Date().getTime()} type="hidden" readOnly />
+        <Form>
           <Form.Item {...formItemLayout} label="Title">
-            <Input />
+            <Input onChange={(e, dest, cont) => this.handleChange(e, 'title', e.target.value)} />
           </Form.Item>
           <Form.Item {...formItemLayout} label="Author">
-            <Input />
+            <Input onChange={(e, dest, cont) => this.handleChange(e, 'author', e.target.value)} />
           </Form.Item>
           <Form.Item {...formItemLayout} label="Message">
-            <Input type="textarea"/>
+            <Input type="textarea" onChange={(e, dest, cont) => this.handleChange(e, 'message', e.target.value)} />
           </Form.Item>
           <Form.Item {...formItemLayout} label="Post category">
-            <Select placeholder="Please select a category">
-              {posts.categories.map(category => (
+            <Select placeholder="Please select a category" onChange={(e) => this.handleChange(e, 'post_category', e)}>
+              {forum.categories.map(category => (
                 <Select.Option key={category.name} value={category.name} style={{textTransform: 'capitalize'}}>{category.name}</Select.Option>
               ))}
             </Select>
           </Form.Item>
-          <Button type="primary" htmlType="submit">Post</Button>
+          <Button type="primary" onClick={e => this.handleSubmit(e)}>Post</Button>
         </Form>
       </div>
     )
   }
 }
 
-function mapStateToProps({posts}) {
-  return {posts}
+function mapStateToProps({forum}) {
+  return {forum}
 }
 
-export default connect(mapStateToProps)(NewPost)
+function mapDispatchToProps(dispatch) {
+  return {
+    addPost: (id, timestamp, title, message, author, post_category) => dispatch(newPost(id, timestamp, title, message, author, post_category))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewPost)

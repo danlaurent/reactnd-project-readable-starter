@@ -19,8 +19,8 @@ const initialReadableState = {
   comments: []
 }
 
-const posts = (state = initialReadableState, action) => {
-  const {id, timestamp, title, body, author, category, option, posts, comments, data} = action
+const forum = (state = initialReadableState, action) => {
+  const {id, timestamp, title, body, author, category, posts, votedPost, comments, parentId, data} = action
   switch (action.type) {
     case GET_CATEGORIES:
       return {
@@ -30,15 +30,39 @@ const posts = (state = initialReadableState, action) => {
     case GET_POSTS:
       return {
         ...state,
-        posts
+        posts: posts.sort((a, b) => a.voteScore < b.voteScore)
       }
     case GET_COMMENTS:
       return {
         ...state,
         comments
       }
+    case CREATE_COMMENT:
+      return {
+        ...state,
+        comments: state.comments.concat({id, timestamp, body, author, parentId})
+      }
+    case EDIT_COMMENT:
+      return {
+        ...state,
+        comments: state.comments.map(c => {
+          if (c.id === id) {
+            c.timestamp = timestamp
+            c.body = body
+          }
+          return c
+        })
+      }
+    case DELETE_COMMENT:
+      return {
+        ...state,
+        comments: state.comments.filter(comment => comment.id !== id)
+      }
     case CREATE_POST:
-      return {id, timestamp, title, body, author, category}
+      return {
+        ...state,
+        posts: state.posts.concat({id, timestamp, title, body, author, category})
+      }
     case EDIT_POST:
       return {
         ...state,
@@ -48,36 +72,17 @@ const posts = (state = initialReadableState, action) => {
     case VOTE_POST:
       return {
         ...state,
-        option
+        posts: state.posts.map(post => {
+          if (post.id === votedPost.id) {
+            post.voteScore = votedPost.voteScore
+          }
+          return post
+        })
       }
     case DELETE_POST:
       return {
-        id
-      }
-    default:
-      return state
-  }
-}
-
-const comments = (state = {}, action) => {
-  const {id, timestamp, body, author, option, parentId} = action
-  switch (action.type) {
-    case CREATE_COMMENT:
-      return {id, timestamp, body, author, parentId}
-    case EDIT_COMMENT:
-      return {
         ...state,
-        body,
-        timestamp
-      }
-    case VOTE_COMMENT:
-      return {
-        ...state,
-        option
-      }
-    case DELETE_COMMENT:
-      return {
-        id
+        posts: state.posts.filter(post => post.id !== id)
       }
     default:
       return state
@@ -85,6 +90,5 @@ const comments = (state = {}, action) => {
 }
 
 export default combineReducers({
-  posts,
-  comments
+  forum
 })

@@ -1,19 +1,38 @@
-import React from 'react'
+import React, { Component } from 'react'
 import Post from './Post'
 import { connect } from 'react-redux'
+import { fetchCategories, fetchPosts, fetchComments } from '../actions'
 import { Link } from 'react-router-dom'
 
-const Home = ({posts}) => (
-  <div>
-    <Link to="/new_post"  style={{marginTop: '1.5em'}}>New post</Link>
-    {posts.posts.map(post => (
-      <Post key={post.id} post={post} />
-    ))}
-  </div>
-)
+class Home extends Component {
 
-function mapStateToProps({posts}) {
-  return {posts}
+  componentDidMount() {
+    this.props.loadCategories()
+    this.props.loadPosts()
+  }
+  render() {
+    const { forum } = this.props
+    return (
+      <div>
+        <Link to="/new_post"  style={{marginTop: '1.5em'}}>New post</Link>
+        {forum.posts.map(post => (
+          <Post key={post.id} post={post} />
+        ))}
+      </div>
+    )
+  }
 }
 
-export default connect(mapStateToProps)(Home)
+function mapStateToProps({forum}) {
+  return {forum}
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    loadCategories: data => dispatch(fetchCategories(data)),
+    loadPosts: data => dispatch(fetchPosts(data)),
+    loadComments: data => dispatch(fetchComments(data))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home)

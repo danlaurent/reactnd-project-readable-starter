@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Layout, Menu } from 'antd';
 import './styles/App.css'
-import { fetchCategories, fetchPosts, fetchComments } from './actions'
 import { connect } from 'react-redux'
 import Home from './components/Home'
 import PostDetails from './components/PostDetails'
@@ -10,15 +9,9 @@ import { Route, withRouter } from 'react-router-dom'
 
 
 class App extends Component {
-
-  componentDidMount() {
-    this.props.loadCategories()
-    this.props.loadPosts()
-  }
-
   render() {
     const { Header, Content, Footer } = Layout;
-    const { posts } = this.props;
+    const { forum } = this.props;
     return (
       <div className="App">
         <Layout className="layout">
@@ -29,7 +22,7 @@ class App extends Component {
               mode="horizontal"
               style={{ lineHeight: '64px' }}
             >
-            {posts.categories.map((category, index) => (
+            {forum && forum.categories.map((category, index) => (
               <Menu.Item key={index} style={{textTransform: 'capitalize'}}>{category.name}</Menu.Item>
             ))}
             </Menu>
@@ -39,7 +32,7 @@ class App extends Component {
               <Home />
             )}
             />
-            <Route path="/post/:id" render={({match}) => (
+            <Route exact path="/post/:id" render={({match}) => (
               <PostDetails match={match} />
             )}
             />
@@ -57,16 +50,8 @@ class App extends Component {
   }
 }
 
-function mapStateToProps({posts}) {
-  return {posts}
+function mapStateToProps({forum}) {
+  return {forum}
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    loadCategories: data => dispatch(fetchCategories(data)),
-    loadPosts: data => dispatch(fetchPosts(data)),
-    loadComments: data => dispatch(fetchComments(data))
-  }
-}
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));
+export default withRouter(connect(mapStateToProps)(App));
