@@ -15,6 +15,11 @@ class Home extends Component {
     return (
       <div>
         <Link to="/new_post"  style={{marginTop: '1.5em'}}>New post</Link>
+        <div>
+          Arrange by:
+          <button>Date</button>
+          <button>Score</button>
+        </div>
         {forum.posts.map(post => (
           <Post key={post.id} post={post} />
         ))}

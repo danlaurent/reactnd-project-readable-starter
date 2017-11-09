@@ -104,6 +104,12 @@ export function editPost({title, body}) {
   }
 }
 
+export const updatePost = (id, title, body) => dispatch => (
+  ReadableAPI.editPost(id, title, body).then(post => (
+    dispatch(editPost({title, body}))
+  ))
+)
+
 export function deletePost({id}) {
   return {
     type: DELETE_POST,

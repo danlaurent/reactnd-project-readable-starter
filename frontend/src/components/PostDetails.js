@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { Icon } from 'antd'
 import { connect } from 'react-redux'
-import { fetchComments, fetchPost, newComment, updateComment } from '../actions'
+import { fetchComments, fetchPost, newComment, updateComment, removeComment, postDelete } from '../actions'
 import * as ReadableAPI from '../utils/ReadableAPI'
 import { convertTimestamp } from '../utils/Helpers'
 import NewComment from './NewComment'
 import { generateId } from '../utils/Helpers'
+import { Link } from 'react-router-dom'
 
 class PostDetails extends Component {
   constructor(props) {
@@ -37,6 +38,13 @@ class PostDetails extends Component {
     const { id, timestamp, message, author, parent_id } = this.state
     const { addComment } = this.props
     addComment(id, timestamp, message, author, parent_id)
+    this.setState({
+      id: '',
+      timestamp: new Date().getTime(),
+      author: '',
+      message: '',
+      parent_id: ''
+    })
   }
 
   handleEdit = (e, commentId) => {
@@ -61,6 +69,18 @@ class PostDetails extends Component {
     editComment(id, timestamp, message)
   }
 
+  handleDelete = (e, id) => {
+    const { removeComment } = this.props
+    e.preventDefault()
+    removeComment(id)
+  }
+
+  handleDeletePost = (id) => {
+    const { history, deletePost } = this.props
+    deletePost(id)
+    history.push('/')
+  }
+
   handleChange = (e, dest, cont) => {
     this.setState({
       [dest]: cont
@@ -68,7 +88,7 @@ class PostDetails extends Component {
   }
 
   render() {
-    const { forum, match } = this.props
+    const { forum, match, deletePost } = this.props
     const details = forum.posts.filter(_ => _.id === match.params.id)
     return (
       <div>
@@ -86,10 +106,10 @@ class PostDetails extends Component {
               <div style={{fontSize: '1.5em', padding: '0.5em 0'}}>{detail.body}</div>
             </div>
             <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', flex: 1}}>
-              <button style={{margin: '0.5em 0'}}>
+              <Link style={{margin: '0.5em 0'}} to={`/post/${detail.id}/edit_post`}>
                 <Icon type="edit" style={{ fontSize: 24, color: '#bbb' }}/>
-              </button>
-              <button style={{margin: '0.5em 0'}}>
+              </Link>
+              <button style={{margin: '0.5em 0'}} onClick={() => this.handleDeletePost(detail.id)}>
                 <Icon type="delete" style={{ fontSize: 24, color: '#bbb' }}/>
               </button>
             </div>
@@ -104,7 +124,7 @@ class PostDetails extends Component {
               <button style={{margin: '0 0.5em'}} onClick={(e) => this.handleEdit(e, comment.id)}>
                 <Icon type="edit" style={{ fontSize: 24, color: '#bbb' }}/>
               </button>
-              <button style={{margin: '0 0.5em'}}>
+              <button style={{margin: '0 0.5em'}} onClick={(e) => this.handleDelete(e, comment.id)}>
                 <Icon type="delete" style={{ fontSize: 24, color: '#bbb' }}/>
               </button>
             </div>
@@ -115,6 +135,7 @@ class PostDetails extends Component {
           handleChange={this.handleChange}
           handleSubmit={this.handleSubmit}
           handleUpdate={this.handleUpdate}
+          authorName={this.state.author}
           bodyContent={this.state.message}
           updateMode={this.state.updateMode}
           />
@@ -132,7 +153,9 @@ function mapDispatchToProps(dispatch) {
     loadComments: data => dispatch(fetchComments(data)),
     loadPost: data => dispatch(fetchPost(data)),
     addComment: (id, timestamp, message, author, parent_id) => dispatch(newComment(id, timestamp, message, author, parent_id)),
-    editComment: (id, timestamp, message) => dispatch(updateComment(id, timestamp, message))
+    editComment: (id, timestamp, message) => dispatch(updateComment(id, timestamp, message)),
+    removeComment: (id) => dispatch(removeComment(id)),
+    deletePost: (id) => dispatch(postDelete(id))
   }
 }
 

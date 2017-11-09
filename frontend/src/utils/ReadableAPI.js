@@ -59,8 +59,8 @@ export const dislikePost = (postId) =>
   }).then(res => res.json())
     .catch(err => console.log(err))
 
-export const editPost = (post, title, body) =>
-  fetch(`${api}/posts/${post.id}`, {
+export const editPost = (postId, title, body) =>
+  fetch(`${api}/posts/${postId}`, {
     method: 'PUT',
     headers: { ...headers, 'Content-Type': 'application/json' },
     body: JSON.stringify({ title, body })

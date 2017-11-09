@@ -6,9 +6,15 @@ import Home from './components/Home'
 import PostDetails from './components/PostDetails'
 import NewPost from './components/NewPost'
 import { Route, withRouter } from 'react-router-dom'
+import {fetchCategories, fetchPosts} from './actions'
 
 
 class App extends Component {
+  componentDidMount() {
+    const { loadCategories, loadPosts } = this.props
+    loadCategories()
+    loadPosts()
+  }
   render() {
     const { Header, Content, Footer } = Layout;
     const { forum } = this.props;
@@ -32,12 +38,16 @@ class App extends Component {
               <Home />
             )}
             />
-            <Route exact path="/post/:id" render={({match}) => (
-              <PostDetails match={match} />
+            <Route exact path="/post/:id" render={({match, history}) => (
+              <PostDetails match={match} history={history} />
             )}
             />
             <Route path="/new_post" render={() => (
               <NewPost />
+            )}
+            />
+            <Route path="/post/:id/edit_post" render={({match, history}) => (
+              <NewPost match={match} history={history} />
             )}
             />
           </Content>
@@ -54,4 +64,11 @@ function mapStateToProps({forum}) {
   return {forum}
 }
 
-export default withRouter(connect(mapStateToProps)(App));
+function mapDispatchToProps(dispatch) {
+  return {
+    loadCategories: data => dispatch(fetchCategories(data)),
+    loadPosts: data => dispatch(fetchPosts(data))
+  }
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));

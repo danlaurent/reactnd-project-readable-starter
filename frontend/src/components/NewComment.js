@@ -8,12 +8,12 @@ class NewComment extends Component {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
     }
-    const { handleChange, handleSubmit, handleUpdate, bodyContent, updateMode } = this.props
+    const { handleChange, handleSubmit, handleUpdate, bodyContent, authorName, updateMode } = this.props
     return (
       <div style={{margin: '2em 0'}}>
         <Form>
           <Form.Item {...formItemLayout} label="Author">
-            <Input onChange={(e, dest, cont) => handleChange(e, 'author', e.target.value)} />
+            <Input onChange={(e, dest, cont) => handleChange(e, 'author', e.target.value)} value={authorName} />
           </Form.Item>
           <Form.Item {...formItemLayout} label="Message">
             <Input type="textarea" onChange={(e, dest, cont) => handleChange(e, 'message', e.target.value)} value={bodyContent} />

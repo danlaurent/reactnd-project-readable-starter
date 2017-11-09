@@ -66,8 +66,13 @@ const forum = (state = initialReadableState, action) => {
     case EDIT_POST:
       return {
         ...state,
-        body,
-        author
+        posts: state.posts.map(p => {
+          if (p.id === id) {
+            p.title = title
+            p.body = body
+          }
+          return p
+        })
       }
     case VOTE_POST:
       return {
