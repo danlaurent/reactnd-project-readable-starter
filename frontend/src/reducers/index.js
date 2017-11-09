@@ -20,7 +20,7 @@ const initialReadableState = {
 }
 
 const forum = (state = initialReadableState, action) => {
-  const {id, timestamp, title, body, author, category, posts, votedPost, comments, parentId, data} = action
+  const {id, timestamp, title, body, author, category, posts, votedPost, voteScore, comments, parentId, data} = action
   switch (action.type) {
     case GET_CATEGORIES:
       return {
@@ -79,7 +79,7 @@ const forum = (state = initialReadableState, action) => {
         ...state,
         posts: state.posts.map(post => {
           if (post.id === votedPost.id) {
-            post.voteScore = votedPost.voteScore
+            post = votedPost
           }
           return post
         })
