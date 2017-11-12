@@ -15,9 +15,9 @@ class App extends Component {
     loadCategories()
     loadPosts()
   }
+
   render() {
     const { Header, Content, Footer } = Layout;
-    const { forum } = this.props;
     return (
       <div className="App">
         <Layout className="layout">
@@ -28,9 +28,6 @@ class App extends Component {
               mode="horizontal"
               style={{ lineHeight: '64px' }}
             >
-            {forum && forum.categories.map((category, index) => (
-              <Menu.Item key={index} style={{textTransform: 'capitalize'}}>{category.name}</Menu.Item>
-            ))}
             </Menu>
           </Header>
           <Content style={{ padding: '0 50px' }}>
@@ -42,8 +39,8 @@ class App extends Component {
               <PostDetails match={match} history={history} />
             )}
             />
-            <Route path="/new_post" render={() => (
-              <NewPost />
+            <Route path="/new_post" render={({history}) => (
+              <NewPost history={history} />
             )}
             />
             <Route path="/post/:id/edit_post" render={({match, history}) => (

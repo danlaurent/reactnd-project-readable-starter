@@ -9,7 +9,9 @@ import {
   CREATE_COMMENT,
   EDIT_COMMENT,
   VOTE_COMMENT,
-  DELETE_COMMENT
+  DELETE_COMMENT,
+  POSTS_BY_SCORE,
+  POSTS_BY_DATE
 } from '../actions'
 import { combineReducers } from 'redux'
 
@@ -20,7 +22,7 @@ const initialReadableState = {
 }
 
 const forum = (state = initialReadableState, action) => {
-  const {id, timestamp, title, body, author, category, posts, votedPost, voteScore, comments, parentId, data} = action
+  const {id, timestamp, title, body, author, category, posts, votedPost, comments, parentId, data} = action
   switch (action.type) {
     case GET_CATEGORIES:
       return {
@@ -88,6 +90,16 @@ const forum = (state = initialReadableState, action) => {
       return {
         ...state,
         posts: state.posts.filter(post => post.id !== id)
+      }
+    case POSTS_BY_SCORE:
+      return {
+        ...state,
+        posts: state.posts.sort((a, b) => a.voteScore < b.voteScore)
+      }
+    case POSTS_BY_DATE:
+      return {
+        ...state,
+        posts: state.posts.sort((a, b) => a.timestamp < b.timestamp)
       }
     default:
       return state

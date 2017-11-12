@@ -4,6 +4,9 @@ export const GET_CATEGORIES = 'GET_CATEGORIES'
 export const GET_POSTS = 'GET_POSTS'
 export const GET_COMMENTS = 'GET_COMMENTS'
 
+export const POSTS_BY_DATE = 'POSTS_BY_DATE'
+export const POSTS_BY_SCORE = 'POSTS_BY_SCORE'
+
 export const CREATE_POST = 'CREATE_POST'
 export const VOTE_POST = 'VOTE_POST'
 export const EDIT_POST = 'EDIT_POST'
@@ -57,6 +60,28 @@ export const fetchComments = (postId) => dispatch => (
   ReadableAPI.getPostComments(postId).then(comments => (
     dispatch(receiveComments(comments))
   ))
+)
+
+export function postsByDate(posts) {
+  return {
+    type: POSTS_BY_DATE,
+    posts
+  }
+}
+
+export const arrangePostsByDate = (posts) => dispatch => (
+  dispatch(postsByDate(posts))
+)
+
+export function postsByScore(posts) {
+  return {
+    type: POSTS_BY_SCORE,
+    posts
+  }
+}
+
+export const arrangePostsByScore = (posts) => dispatch => (
+  dispatch(postsByScore(posts))
 )
 
 export function addPost({id, timestamp, title, body, author, category}) {

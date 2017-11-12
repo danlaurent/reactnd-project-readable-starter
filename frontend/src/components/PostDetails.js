@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { Icon } from 'antd'
 import { connect } from 'react-redux'
-import { fetchComments, fetchPost, newComment, updateComment, removeComment, postDelete } from '../actions'
+import { fetchComments, fetchPost, newComment, updateComment, removeComment, postDelete, likePost, dislikePost } from '../actions'
 import * as ReadableAPI from '../utils/ReadableAPI'
 import { convertTimestamp } from '../utils/Helpers'
 import NewComment from './NewComment'
+import VoteControls from './VoteControls'
 import { generateId } from '../utils/Helpers'
 import { Link } from 'react-router-dom'
 
@@ -88,17 +89,13 @@ class PostDetails extends Component {
   }
 
   render() {
-    const { forum, match, deletePost } = this.props
+    const { forum, match, like, dislike } = this.props
     const details = forum.posts.filter(_ => _.id === match.params.id)
     return (
       <div>
         {details.map(detail => (
           <div key={detail.id} style={{ background: '#fff', padding: 24, minHeight: 80, marginTop: 24, display: 'flex'}}>
-            <div style={{display: 'flex', flexDirection: 'column', flex: 1}}>
-              <Icon type="up" style={{ fontSize: 24, color: '#bbb' }}/>
-              <span>{detail.voteScore}</span>
-              <Icon type="down" style={{ fontSize: 24, color: '#bbb' }}/>
-            </div>
+            <VoteControls target={detail} like={like} dislike={dislike} />
             <div style={{display: 'flex', flexDirection: 'column', margin: '0 2em', textAlign: 'left', flex: 12}}>
               <h1>{detail.title}</h1>
               <small style={{textAlign: 'left'}}>Submitted {convertTimestamp(detail.timestamp)} by {detail.author}</small>
@@ -155,7 +152,9 @@ function mapDispatchToProps(dispatch) {
     addComment: (id, timestamp, message, author, parent_id) => dispatch(newComment(id, timestamp, message, author, parent_id)),
     editComment: (id, timestamp, message) => dispatch(updateComment(id, timestamp, message)),
     removeComment: (id) => dispatch(removeComment(id)),
-    deletePost: (id) => dispatch(postDelete(id))
+    deletePost: (id) => dispatch(postDelete(id)),
+    like: (postId) => dispatch(likePost(postId)),
+    dislike: (postId) => dispatch(dislikePost(postId))
   }
 }
 

@@ -45,13 +45,14 @@ class NewPost extends Component {
   handleSubmit = (e) => {
     e.preventDefault()
     const { id, timestamp, title, message, author, post_category } = this.state
-    const { addPost } = this.props
+    const { addPost, history } = this.props
     addPost(id, timestamp, title, message, author, post_category)
+    history.push('/')
   }
 
   handleUpdate = (e) => {
     e.preventDefault()
-    const { id, title, message, editMode } = this.state
+    const { id, title, message } = this.state
     const { updatePost, history } = this.props
     updatePost(id, title, message)
     this.setState({
