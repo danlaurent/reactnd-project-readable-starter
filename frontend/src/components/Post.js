@@ -1,5 +1,4 @@
 import React from 'react'
-import { Icon } from 'antd'
 import { Link } from 'react-router-dom'
 import { convertTimestamp } from '../utils/Helpers'
 import { likePost, dislikePost } from '../actions'

@@ -3,7 +3,7 @@ import Post from './Post'
 import { connect } from 'react-redux'
 import { fetchCategories, fetchPosts, fetchComments, arrangePostsByDate, arrangePostsByScore } from '../actions'
 import { Link } from 'react-router-dom'
-import { Tabs } from 'antd'
+import { Tabs, Button } from 'antd'
 
 class Home extends Component {
 
@@ -15,13 +15,15 @@ class Home extends Component {
     const { forum, arrangeByDate, arrangeByScore } = this.props
     return (
       <div>
-        <Link to="/new_post"  style={{marginTop: '1.5em'}}>New post</Link>
+        <Button style={{margin: '1em 0'}} icon="plus-circle-o" type="primary">
+          <Link to="/new_post"  style={{marginTop: '1.5em', textDecoration: 'none', color: '#fff'}}> New post</Link>
+        </Button>
         <div>
           Arrange by:
-          <button onClick={(posts) => arrangeByDate(posts)}>Date</button>
-          <button onClick={(posts) => arrangeByScore(posts)}>Score</button>
+          <Button style={{margin: '1em'}} icon="like-o" onClick={(posts) => arrangeByScore(posts)}>Score</Button>
+          <Button style={{marginLeft: '0 0.5em'}} icon="calendar" onClick={(posts) => arrangeByDate(posts)}>Date</Button>
         </div>
-        <Tabs type="line">
+        <Tabs type="line" tabBarStyle={{textTransform: 'capitalize'}}>
           <Tabs.TabPane tab="all" key="all">
             {forum.posts.map(post => (
               <Post key={post.id} post={post} />

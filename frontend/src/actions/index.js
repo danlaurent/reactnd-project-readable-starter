@@ -6,6 +6,8 @@ export const GET_COMMENTS = 'GET_COMMENTS'
 
 export const POSTS_BY_DATE = 'POSTS_BY_DATE'
 export const POSTS_BY_SCORE = 'POSTS_BY_SCORE'
+export const COMMENTS_BY_DATE = 'COMMENTS_BY_DATE'
+export const COMMENTS_BY_SCORE = 'COMMENTS_BY_SCORE'
 
 export const CREATE_POST = 'CREATE_POST'
 export const VOTE_POST = 'VOTE_POST'
@@ -82,6 +84,28 @@ export function postsByScore(posts) {
 
 export const arrangePostsByScore = (posts) => dispatch => (
   dispatch(postsByScore(posts))
+)
+
+export function commentsByDate(comments) {
+  return {
+    type: COMMENTS_BY_DATE,
+    comments
+  }
+}
+
+export const arrangeCommentsByDate = (comments) => dispatch => (
+  dispatch(commentsByDate(comments))
+)
+
+export function commentsByScore(comments) {
+  return {
+    type: COMMENTS_BY_SCORE,
+    comments
+  }
+}
+
+export const arrangeCommentsByScore = (comments) => dispatch => (
+  dispatch(commentsByScore(comments))
 )
 
 export function addPost({id, timestamp, title, body, author, category}) {
@@ -165,12 +189,24 @@ export const newComment = (id, timestamp, body, author, parentId) => dispatch =>
   ))
 )
 
-export function voteComment({option}) {
+export function voteComment({votedComment}) {
   return {
     type: VOTE_COMMENT,
-    option
+    votedComment
   }
 }
+
+export const likeComment = (commentId) => dispatch => (
+  ReadableAPI.likeComment(commentId).then(votedComment => (
+    dispatch(voteComment({votedComment}))
+  ))
+)
+
+export const dislikeComment = (commentId) => dispatch => (
+  ReadableAPI.dislikeComment(commentId).then(votedComment => (
+    dispatch(voteComment({votedComment}))
+  ))
+)
 
 export function editComment({id, timestamp, body}) {
   return {

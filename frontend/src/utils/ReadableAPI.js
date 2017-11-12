@@ -94,11 +94,19 @@ export const getComment = (commentId) =>
     .then(data => data)
     .catch(err => console.log(err))
 
-export const voteComment = (comment, vote) =>
-  fetch(`${api}/comments/${comment.id}`, {
+export const likeComment = (commentId) =>
+  fetch(`${api}/comments/${commentId}`, {
     method: 'POST',
     headers: { ...headers, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ option: vote })
+    body: JSON.stringify({ option: "upVote" })
+  }).then(res => res.json())
+    .catch(err => console.log(err))
+
+export const dislikeComment = (commentId) =>
+  fetch(`${api}/comments/${commentId}`, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ option: "downVote" })
   }).then(res => res.json())
     .catch(err => console.log(err))
 

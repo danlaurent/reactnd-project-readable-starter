@@ -22,7 +22,6 @@ class App extends Component {
       <div className="App">
         <Layout className="layout">
           <Header>
-            <div className="logo" />
             <Menu
               theme="dark"
               mode="horizontal"
@@ -30,7 +29,7 @@ class App extends Component {
             >
             </Menu>
           </Header>
-          <Content style={{ padding: '0 50px' }}>
+          <Content style={{ padding: '0 50px', minHeight: '82vh' }}>
             <Route exact path="/" render={() => (
               <Home />
             )}

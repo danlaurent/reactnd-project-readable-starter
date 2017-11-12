@@ -11,7 +11,9 @@ import {
   VOTE_COMMENT,
   DELETE_COMMENT,
   POSTS_BY_SCORE,
-  POSTS_BY_DATE
+  POSTS_BY_DATE,
+  COMMENTS_BY_SCORE,
+  COMMENTS_BY_DATE
 } from '../actions'
 import { combineReducers } from 'redux'
 
@@ -22,7 +24,7 @@ const initialReadableState = {
 }
 
 const forum = (state = initialReadableState, action) => {
-  const {id, timestamp, title, body, author, category, posts, votedPost, comments, parentId, data} = action
+  const {id, timestamp, title, body, author, category, posts, votedPost, votedComment, comments, parentId, data} = action
   switch (action.type) {
     case GET_CATEGORIES:
       return {
@@ -42,7 +44,7 @@ const forum = (state = initialReadableState, action) => {
     case CREATE_COMMENT:
       return {
         ...state,
-        comments: state.comments.concat({id, timestamp, body, author, parentId})
+        comments: state.comments.concat({id, timestamp, body, author, voteScore: 1,parentId})
       }
     case EDIT_COMMENT:
       return {
@@ -86,6 +88,16 @@ const forum = (state = initialReadableState, action) => {
           return post
         })
       }
+    case VOTE_COMMENT:
+      return {
+        ...state,
+        comments: state.comments.map(comment => {
+          if (comment.id === votedComment.id) {
+            comment = votedComment
+          }
+          return comment
+        })
+      }
     case DELETE_POST:
       return {
         ...state,
@@ -100,6 +112,16 @@ const forum = (state = initialReadableState, action) => {
       return {
         ...state,
         posts: state.posts.sort((a, b) => a.timestamp < b.timestamp)
+      }
+    case COMMENTS_BY_SCORE:
+      return {
+        ...state,
+        comments: state.comments.sort((a, b) => a.voteScore < b.voteScore)
+      }
+    case COMMENTS_BY_DATE:
+      return {
+        ...state,
+        comments: state.comments.sort((a, b) => a.timestamp < b.timestamp)
       }
     default:
       return state

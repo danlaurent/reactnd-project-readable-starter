@@ -1,10 +1,22 @@
 import React, { Component } from 'react'
-import { Icon } from 'antd'
+import { Icon, Button } from 'antd'
 import { connect } from 'react-redux'
-import { fetchComments, fetchPost, newComment, updateComment, removeComment, postDelete, likePost, dislikePost } from '../actions'
+import {
+  fetchComments,
+  fetchPost,
+  newComment,
+  updateComment,
+  removeComment,
+  postDelete,
+  likePost,
+  dislikePost,
+  arrangeCommentsByDate,
+  arrangeCommentsByScore
+} from '../actions'
 import * as ReadableAPI from '../utils/ReadableAPI'
 import { convertTimestamp } from '../utils/Helpers'
 import NewComment from './NewComment'
+import Comment from './Comment'
 import VoteControls from './VoteControls'
 import { generateId } from '../utils/Helpers'
 import { Link } from 'react-router-dom'
@@ -68,6 +80,9 @@ class PostDetails extends Component {
     const { id, timestamp, message } = this.state
     const { editComment } = this.props
     editComment(id, timestamp, message)
+    this.setState({
+      message: ''
+    })
   }
 
   handleDelete = (e, id) => {
@@ -89,10 +104,15 @@ class PostDetails extends Component {
   }
 
   render() {
-    const { forum, match, like, dislike } = this.props
+    const { forum, match, like, dislike, arrangeByDate, arrangeByScore } = this.props
     const details = forum.posts.filter(_ => _.id === match.params.id)
     return (
       <div>
+        <div>
+          Arrange Comments by:
+          <Button style={{margin: '1em'}} icon="like-o" onClick={(comments) => arrangeByScore(forum.comments)}>Score</Button>
+          <Button style={{marginLeft: '0 0.5em'}} icon="calendar" onClick={(comments) => arrangeByDate(forum.comments)}>Date</Button>
+        </div>
         {details.map(detail => (
           <div key={detail.id} style={{ background: '#fff', padding: 24, minHeight: 80, marginTop: 24, display: 'flex'}}>
             <VoteControls target={detail} like={like} dislike={dislike} />
@@ -114,18 +134,12 @@ class PostDetails extends Component {
         ))}
         <hr />
         {forum.comments.filter(_ => _.parentId === match.params.id).map(comment => (
-          <div key={comment.id} style={{ background: '#fff', padding: 24, minHeight: 80, marginTop: 24, textAlign: 'left', marginLeft: 24, borderLeft: '1px solid gray'}}>
-            <span>{comment.author}</span>
-            <p>{comment.body}</p>
-            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-              <button style={{margin: '0 0.5em'}} onClick={(e) => this.handleEdit(e, comment.id)}>
-                <Icon type="edit" style={{ fontSize: 24, color: '#bbb' }}/>
-              </button>
-              <button style={{margin: '0 0.5em'}} onClick={(e) => this.handleDelete(e, comment.id)}>
-                <Icon type="delete" style={{ fontSize: 24, color: '#bbb' }}/>
-              </button>
-            </div>
-          </div>
+          <Comment
+            comment={comment}
+            key={comment.id}
+            handleEdit={this.handleEdit}
+            handleDelete={this.handleDelete}
+          />
         ))}
         <NewComment
           match={match}
@@ -154,7 +168,9 @@ function mapDispatchToProps(dispatch) {
     removeComment: (id) => dispatch(removeComment(id)),
     deletePost: (id) => dispatch(postDelete(id)),
     like: (postId) => dispatch(likePost(postId)),
-    dislike: (postId) => dispatch(dislikePost(postId))
+    dislike: (postId) => dispatch(dislikePost(postId)),
+    arrangeByDate: comments => dispatch(arrangeCommentsByDate(comments)),
+    arrangeByScore: comments => dispatch(arrangeCommentsByScore(comments))
   }
 }
 
