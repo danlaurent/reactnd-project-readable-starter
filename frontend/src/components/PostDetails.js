@@ -11,7 +11,9 @@ import {
   likePost,
   dislikePost,
   arrangeCommentsByDate,
-  arrangeCommentsByScore
+  arrangeCommentsByScore,
+  formCommentNormal,
+  formCommentUpdate
 } from '../actions'
 import * as ReadableAPI from '../utils/ReadableAPI'
 import { convertTimestamp } from '../utils/Helpers'
@@ -29,53 +31,50 @@ class PostDetails extends Component {
       timestamp: new Date().getTime(),
       author: '',
       message: '',
-      parent_id: '',
-      updateMode: false
+      parent_id: ''
     }
   }
 
   componentDidMount() {
-    this.props.loadComments(this.props.match.params.id)
-    ReadableAPI.getPost(this.props.match.params.id).then(post => {
-      this.setState({details: post})
-    })
-    this.setState({
-      id: generateId(),
-      timestamp: new Date().getTime(),
-      parent_id: this.props.match.params.id
-    })
+    this.props.loadComments(this.props.match.params.post_id)
+
   }
 
   handleSubmit = (e) => {
     e.preventDefault()
-    const { id, timestamp, message, author, parent_id } = this.state
+    const { message, author } = this.state
     const { addComment } = this.props
-    addComment(id, timestamp, message, author, parent_id)
-    this.setState({
-      id: '',
-      timestamp: new Date().getTime(),
-      author: '',
-      message: '',
-      parent_id: ''
-    })
+    const id = generateId()
+    const timestamp = new Date().getTime()
+    addComment(id, timestamp, message, author, this.props.match.params.post_id).then(() => (
+      this.setState({
+        id: '',
+        timestamp: new Date().getTime(),
+        author: '',
+        message: '',
+        parent_id: ''
+      })
+    ))
   }
 
   handleEdit = (e, commentId) => {
+    const {formUpdate} = this.props
     e.preventDefault()
+    formUpdate()
     ReadableAPI.getComment(commentId).then(comment => (
       this.setState({
         id: comment.id,
-        message: comment.body,
-        updateMode: true
+        message: comment.body
       })
     ))
   }
 
   handleUpdate = (e) => {
     e.preventDefault()
+    const {formNormal} = this.props
+    formNormal()
     this.setState({
       timestamp: new Date().getTime(),
-      updateMode: false
     })
     const { id, timestamp, message } = this.state
     const { editComment } = this.props
@@ -104,26 +103,27 @@ class PostDetails extends Component {
   }
 
   render() {
-    const { forum, match, like, dislike, arrangeByDate, arrangeByScore } = this.props
-    const details = forum.posts.filter(_ => _.id === match.params.id)
+    const { forum, comments, match, like, dislike, arrangeByDate, arrangeByScore } = this.props
+    const details = forum.posts.filter(_ => _.id === match.params.post_id)
+    const commentsNumber = forum.comments.length
     return (
       <div>
         <div>
           Arrange Comments by:
-          <Button style={{margin: '1em'}} icon="like-o" onClick={(comments) => arrangeByScore(forum.comments)}>Score</Button>
-          <Button style={{marginLeft: '0 0.5em'}} icon="calendar" onClick={(comments) => arrangeByDate(forum.comments)}>Date</Button>
+          <Button style={{margin: '1em'}} icon="like-o" onClick={(postId) => arrangeByScore(match.params.post_id)}>Score</Button>
+          <Button style={{marginLeft: '0 0.5em'}} icon="calendar" onClick={(postId) => arrangeByDate(match.params.post_id)}>Date</Button>
         </div>
         {details.map(detail => (
           <div key={detail.id} style={{ background: '#fff', padding: 24, minHeight: 80, marginTop: 24, display: 'flex'}}>
             <VoteControls target={detail} like={like} dislike={dislike} />
             <div style={{display: 'flex', flexDirection: 'column', margin: '0 2em', textAlign: 'left', flex: 12}}>
               <h1>{detail.title}</h1>
-              <small style={{textAlign: 'left'}}>Submitted {convertTimestamp(detail.timestamp)} by {detail.author}</small>
+              <small style={{textAlign: 'left'}}>Submitted {convertTimestamp(detail.timestamp)} by {detail.author} - {commentsNumber} comments</small>
               <hr />
               <div style={{fontSize: '1.5em', padding: '0.5em 0'}}>{detail.body}</div>
             </div>
             <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', flex: 1}}>
-              <Link style={{margin: '0.5em 0'}} to={`/post/${detail.id}/edit_post`}>
+              <Link style={{margin: '0.5em 0'}} to={`/${detail.category}/${detail.id}/edit_post`}>
                 <Icon type="edit" style={{ fontSize: 24, color: '#bbb' }}/>
               </Link>
               <button style={{margin: '0.5em 0'}} onClick={() => this.handleDeletePost(detail.id)}>
@@ -133,7 +133,7 @@ class PostDetails extends Component {
           </div>
         ))}
         <hr />
-        {forum.comments.filter(_ => _.parentId === match.params.id).map(comment => (
+        {comments.map(comment => (
           <Comment
             comment={comment}
             key={comment.id}
@@ -148,15 +148,18 @@ class PostDetails extends Component {
           handleUpdate={this.handleUpdate}
           authorName={this.state.author}
           bodyContent={this.state.message}
-          updateMode={this.state.updateMode}
           />
       </div>
     )
   }
 }
 
-function mapStateToProps({forum}) {
-  return {forum}
+function mapStateToProps({forum}, ownProps) {
+  const { match } = ownProps
+  return {
+    forum,
+    comments: forum.comments.filter(_ => _.parentId === match.params.post_id)
+  }
 }
 
 function mapDispatchToProps(dispatch) {
@@ -169,8 +172,10 @@ function mapDispatchToProps(dispatch) {
     deletePost: (id) => dispatch(postDelete(id)),
     like: (postId) => dispatch(likePost(postId)),
     dislike: (postId) => dispatch(dislikePost(postId)),
-    arrangeByDate: comments => dispatch(arrangeCommentsByDate(comments)),
-    arrangeByScore: comments => dispatch(arrangeCommentsByScore(comments))
+    arrangeByDate: postId => dispatch(arrangeCommentsByDate(postId)),
+    arrangeByScore: postId => dispatch(arrangeCommentsByScore(postId)),
+    formUpdate: () => dispatch(formCommentUpdate()),
+    formNormal: () => dispatch(formCommentNormal())
   }
 }
 

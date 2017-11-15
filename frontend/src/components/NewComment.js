@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Form, Input, Button } from 'antd'
+import { connect } from 'react-redux'
 
 
 class NewComment extends Component {
@@ -8,10 +9,10 @@ class NewComment extends Component {
       labelCol: { span: 6 },
       wrapperCol: { span: 14 },
     }
-    const { handleChange, handleSubmit, handleUpdate, bodyContent, authorName, updateMode } = this.props
+    const { handleChange, handleSubmit, handleUpdate, bodyContent, authorName, formMode } = this.props
     return (
       <div style={{margin: '2em 0'}}>
-          {updateMode
+          {formMode
             ? (
                 <Form>
                   <Form.Item {...formItemLayout} label="Message">
@@ -37,4 +38,10 @@ class NewComment extends Component {
   }
 }
 
-export default NewComment
+function mapStateToProps({formMode}) {
+  return {
+    formMode: formMode.commentEditMode
+  }
+}
+
+export default connect(mapStateToProps)(NewComment)

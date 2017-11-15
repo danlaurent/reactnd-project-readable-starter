@@ -19,6 +19,12 @@ export const VOTE_COMMENT = 'VOTE_COMMENT'
 export const EDIT_COMMENT = 'EDIT_COMMENT'
 export const DELETE_COMMENT = 'DELETE_COMMENT'
 
+export const FORM_POST_NORMAL = 'FORM_POST_NORMAL'
+export const FORM_POST_EDIT = 'FORM_POST_EDIT'
+
+export const FORM_COMMENT_NORMAL = 'FORM_COMMENT_NORMAL'
+export const FORM_COMMENT_UPDATE = 'FORM_COMMENT_UPDATE'
+
 export function receiveCategories(data) {
   return {
     type: GET_CATEGORIES,
@@ -67,45 +73,53 @@ export const fetchComments = (postId) => dispatch => (
 export function postsByDate(posts) {
   return {
     type: POSTS_BY_DATE,
-    posts
+    posts: posts.sort((a, b) => a.timestamp < b.timestamp)
   }
 }
 
 export const arrangePostsByDate = (posts) => dispatch => (
-  dispatch(postsByDate(posts))
+  ReadableAPI.getPosts().then(posts => (
+    dispatch(postsByDate(posts))
+  ))
 )
 
 export function postsByScore(posts) {
   return {
     type: POSTS_BY_SCORE,
-    posts
+    posts: posts.sort((a, b) => a.voteScore < b.voteScore)
   }
 }
 
 export const arrangePostsByScore = (posts) => dispatch => (
-  dispatch(postsByScore(posts))
+  ReadableAPI.getPosts().then(posts => (
+    dispatch(postsByScore(posts))
+  ))
 )
 
 export function commentsByDate(comments) {
   return {
     type: COMMENTS_BY_DATE,
-    comments
+    comments: comments.sort((a, b) => a.timestamp < b.timestamp)
   }
 }
 
-export const arrangeCommentsByDate = (comments) => dispatch => (
-  dispatch(commentsByDate(comments))
+export const arrangeCommentsByDate = (postId) => dispatch => (
+  ReadableAPI.getPostComments(postId).then(comments => (
+    dispatch(commentsByDate(comments))
+  ))
 )
 
 export function commentsByScore(comments) {
   return {
     type: COMMENTS_BY_SCORE,
-    comments
+    comments: comments.sort((a, b) => a.voteScore < b.voteScore)
   }
 }
 
-export const arrangeCommentsByScore = (comments) => dispatch => (
-  dispatch(commentsByScore(comments))
+export const arrangeCommentsByScore = (postId) => dispatch => (
+  ReadableAPI.getPostComments(postId).then(comments => (
+    dispatch(commentsByScore(comments))
+  ))
 )
 
 export function addPost({id, timestamp, title, body, author, category}) {
@@ -145,17 +159,16 @@ export const dislikePost = (postId) => dispatch => (
   ))
 )
 
-export function editPost({title, body}) {
+export function editPost({post}) {
   return {
     type: EDIT_POST,
-    title,
-    body
+    post
   }
 }
 
 export const updatePost = (id, title, body) => dispatch => (
   ReadableAPI.editPost(id, title, body).then(post => (
-    dispatch(editPost({title, body}))
+    dispatch(editPost({post}))
   ))
 )
 
@@ -235,3 +248,31 @@ export const removeComment = (id) => dispatch => (
     dispatch(deleteComment({id}))
   ))
 )
+
+export function formCommentUpdate() {
+  return {
+    type: FORM_COMMENT_UPDATE,
+    updateMode: true
+  }
+}
+
+export function formPostEdit() {
+  return {
+    type: FORM_POST_EDIT,
+    editMode: true
+  }
+}
+
+export function formCommentNormal() {
+  return {
+    type: FORM_COMMENT_NORMAL,
+    updateMode: false
+  }
+}
+
+export function formPostNormal() {
+  return {
+    type: FORM_POST_NORMAL,
+    editMode: false
+  }
+}

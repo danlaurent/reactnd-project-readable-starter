@@ -13,7 +13,11 @@ import {
   POSTS_BY_SCORE,
   POSTS_BY_DATE,
   COMMENTS_BY_SCORE,
-  COMMENTS_BY_DATE
+  COMMENTS_BY_DATE,
+  FORM_POST_NORMAL,
+  FORM_POST_EDIT,
+  FORM_COMMENT_UPDATE,
+  FORM_COMMENT_NORMAL
 } from '../actions'
 import { combineReducers } from 'redux'
 
@@ -23,8 +27,9 @@ const initialReadableState = {
   comments: []
 }
 
+
 const forum = (state = initialReadableState, action) => {
-  const {id, timestamp, title, body, author, category, posts, votedPost, votedComment, comments, parentId, data} = action
+  const {id, timestamp, title, body, author, category, posts, post, votedPost, votedComment, comments, parentId, data} = action
   switch (action.type) {
     case GET_CATEGORIES:
       return {
@@ -44,7 +49,7 @@ const forum = (state = initialReadableState, action) => {
     case CREATE_COMMENT:
       return {
         ...state,
-        comments: state.comments.concat({id, timestamp, body, author, voteScore: 1,parentId})
+        comments: state.comments.concat({id, timestamp, body, author, voteScore: 1, parentId})
       }
     case EDIT_COMMENT:
       return {
@@ -71,9 +76,8 @@ const forum = (state = initialReadableState, action) => {
       return {
         ...state,
         posts: state.posts.map(p => {
-          if (p.id === id) {
-            p.title = title
-            p.body = body
+          if (p.id === post.id) {
+            p = post
           }
           return p
         })
@@ -106,22 +110,52 @@ const forum = (state = initialReadableState, action) => {
     case POSTS_BY_SCORE:
       return {
         ...state,
-        posts: state.posts.sort((a, b) => a.voteScore < b.voteScore)
+        posts
       }
     case POSTS_BY_DATE:
       return {
         ...state,
-        posts: state.posts.sort((a, b) => a.timestamp < b.timestamp)
+        posts
       }
     case COMMENTS_BY_SCORE:
       return {
         ...state,
-        comments: state.comments.sort((a, b) => a.voteScore < b.voteScore)
+        comments
       }
     case COMMENTS_BY_DATE:
       return {
         ...state,
-        comments: state.comments.sort((a, b) => a.timestamp < b.timestamp)
+        comments
+      }
+    default:
+      return state
+  }
+}
+
+
+const initialFormMode = {
+  postEditMode: false,
+  commentEditMode: false
+}
+
+const formMode = (state = initialFormMode, action) => {
+  const { editMode, updateMode } = action
+  switch (action.type) {
+    case FORM_POST_NORMAL:
+      return {
+        postEditMode: editMode
+      }
+    case FORM_POST_EDIT:
+      return {
+        postEditMode: editMode
+      }
+    case FORM_COMMENT_NORMAL:
+      return {
+        commentEditMode: updateMode
+      }
+    case FORM_COMMENT_UPDATE:
+      return {
+        commentEditMode: updateMode
       }
     default:
       return state
@@ -129,5 +163,7 @@ const forum = (state = initialReadableState, action) => {
 }
 
 export default combineReducers({
-  forum
+  forum,
+  formMode
 })
+

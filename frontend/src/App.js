@@ -5,7 +5,8 @@ import { connect } from 'react-redux'
 import Home from './components/Home'
 import PostDetails from './components/PostDetails'
 import NewPost from './components/NewPost'
-import { Route, withRouter } from 'react-router-dom'
+import Category from './components/Category'
+import { Route, withRouter, Link, Switch } from 'react-router-dom'
 import {fetchCategories, fetchPosts} from './actions'
 
 
@@ -18,6 +19,7 @@ class App extends Component {
 
   render() {
     const { Header, Content, Footer } = Layout;
+    const { categories } = this.props
     return (
       <div className="App">
         <Layout className="layout">
@@ -27,6 +29,11 @@ class App extends Component {
               mode="horizontal"
               style={{ lineHeight: '64px' }}
             >
+            {categories.map(category => (
+              <Menu.Item key={category.name}>
+                <Link to={`/${category.name}`} style={{textTransform: 'capitalize'}}>{category.name}</Link>
+              </Menu.Item>
+            ))}
             </Menu>
           </Header>
           <Content style={{ padding: '0 50px', minHeight: '82vh' }}>
@@ -34,18 +41,24 @@ class App extends Component {
               <Home />
             )}
             />
-            <Route exact path="/post/:id" render={({match, history}) => (
-              <PostDetails match={match} history={history} />
-            )}
-            />
-            <Route path="/new_post" render={({history}) => (
-              <NewPost history={history} />
-            )}
-            />
-            <Route path="/post/:id/edit_post" render={({match, history}) => (
-              <NewPost match={match} history={history} />
-            )}
-            />
+            <Switch>
+              <Route exact path="/new_post" render={({history}) => (
+                <NewPost history={history} />
+              )}
+              />
+              <Route exact path="/:category" render={({match, history}) => (
+                <Category match={match} history={history} />
+              )}
+              />
+              <Route exact path="/:category/:post_id" render={({match, history}) => (
+                <PostDetails match={match} history={history} />
+              )}
+              />
+              <Route path="/:category/:id/edit_post" render={({match, history}) => (
+                <NewPost match={match} history={history} />
+              )}
+              />
+            </Switch>
           </Content>
           <Footer style={{ textAlign: 'center' }}>
             Readable ©2017 by @danlaurent
@@ -57,7 +70,9 @@ class App extends Component {
 }
 
 function mapStateToProps({forum}) {
-  return {forum}
+  return {
+    categories: forum.categories
+  }
 }
 
 function mapDispatchToProps(dispatch) {

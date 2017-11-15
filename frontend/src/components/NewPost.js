@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { Form, Input, Select, Button } from 'antd'
 import { connect } from 'react-redux'
-import { newPost, updatePost } from '../actions'
+import { newPost, updatePost, formPostNormal, formPostEdit } from '../actions'
 import * as ReadableAPI from '../utils/ReadableAPI'
+import { generateId } from '../utils/Helpers'
 
 class NewPost extends Component {
 
@@ -14,38 +15,30 @@ class NewPost extends Component {
       title: '',
       author: '',
       message: '',
-      post_category: '',
-      editMode: false
+      post_category: ''
     }
   }
 
-  generateId = () => (
-    Math.random().toString(36).substr(-8)
-  )
-
   componentDidMount() {
-    const { match } = this.props
+    const { match, formUpdate } = this.props
     if (match) {
+      formUpdate()
       ReadableAPI.getPost(match.params.id).then(post => (
         this.setState({
           id: post.id,
           title: post.title,
-          message: post.body,
-          editMode: true
+          message: post.body
         })
       ))
-    } else {
-      this.setState({
-        id: this.generateId(),
-        timestamp: new Date().getTime()
-      })
     }
   }
 
   handleSubmit = (e) => {
     e.preventDefault()
-    const { id, timestamp, title, message, author, post_category } = this.state
+    const { title, message, author, post_category } = this.state
     const { addPost, history } = this.props
+    const id = generateId()
+    const timestamp = new Date().getTime()
     addPost(id, timestamp, title, message, author, post_category)
     history.push('/')
   }
@@ -53,15 +46,15 @@ class NewPost extends Component {
   handleUpdate = (e) => {
     e.preventDefault()
     const { id, title, message } = this.state
-    const { updatePost, history } = this.props
+    const { updatePost, history, formNormal, match } = this.props
     updatePost(id, title, message)
+    formNormal()
     this.setState({
       id: '',
       title: '',
-      message: '',
-      editMode: false
+      message: ''
     })
-    history.push('/')
+    history.push(`/${match.params.category}/${match.params.id}`)
   }
 
   handleChange = (e, dest, cont) => {
@@ -71,7 +64,8 @@ class NewPost extends Component {
   }
 
   render() {
-    const { editMode, title, message } = this.state
+    const { title, message } = this.state
+    const { editMode } = this.props
     const {forum} = this.props
     const formItemLayout = {
       labelCol: { span: 6 },
@@ -119,14 +113,19 @@ class NewPost extends Component {
   }
 }
 
-function mapStateToProps({forum}) {
-  return {forum}
+function mapStateToProps({forum, formMode}) {
+  return {
+    forum,
+    editMode: formMode.postEditMode
+  }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     addPost: (id, timestamp, title, message, author, post_category) => dispatch(newPost(id, timestamp, title, message, author, post_category)),
-    updatePost: (id, title, message) => dispatch(updatePost(id, title, message))
+    updatePost: (id, title, message) => dispatch(updatePost(id, title, message)),
+    formUpdate: () => dispatch(formPostEdit()),
+    formNormal: () => dispatch(formPostNormal())
   }
 }
 

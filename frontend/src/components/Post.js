@@ -9,14 +9,16 @@ const Post = ({post, like, dislike}) => (
   <div style={{ background: '#fff', padding: 24, minHeight: 80, marginTop: 24, display: 'flex' }}>
     <VoteControls target={post} like={like} dislike={dislike} />
     <div style={{display: 'flex', flexDirection: 'column', margin: '0 2em'}}>
-      <Link style={{textAlign: 'left', fontSize: '1.5em'}} to={`/post/${post.id}`}>{post.title}</Link>
+      <Link style={{textAlign: 'left', fontSize: '1.5em'}} to={`/${post.category}/${post.id}`}>{post.title}</Link>
       <small style={{textAlign: 'left'}}>Submitted {convertTimestamp(post.timestamp)} by {post.author}</small>
     </div>
   </div>
 )
 
-function mapStateToProps({posts}) {
-  return {posts}
+function mapStateToProps({forum}) {
+  return {
+    forum
+  }
 }
 
 function mapDispatchToProps(dispatch) {
