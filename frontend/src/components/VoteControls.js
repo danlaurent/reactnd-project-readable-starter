@@ -1,15 +1,11 @@
 import React from 'react'
-import { Icon } from 'antd'
+import { Button } from 'antd'
 
 const VoteControls = ({target, like, dislike}) => (
   <div style={{display: 'flex', flexDirection: 'column'}}>
-    <button onClick={() => like(target.id)}>
-      <Icon type="up" style={{ fontSize: 24, color: '#bbb' }}/>
-    </button>
+    <Button shape="circle" icon="up" type="default" onClick={() => like(target.id)} />
     <span style={{textAlign: 'center'}}>{target.voteScore}</span>
-    <button onClick={() => dislike(target.id)}>
-      <Icon type="down" style={{ fontSize: 24, color: '#bbb' }}/>
-    </button>
+    <Button shape="circle" icon="down" type="default" onClick={() => dislike(target.id)} />
   </div>
 )
 

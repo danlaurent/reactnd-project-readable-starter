@@ -29,6 +29,9 @@ class App extends Component {
               mode="horizontal"
               style={{ lineHeight: '64px' }}
             >
+            <Menu.Item>
+              <Link to={`/`}>Home</Link>
+            </Menu.Item>
             {categories.map(category => (
               <Menu.Item key={category.name}>
                 <Link to={`/${category.name}`} style={{textTransform: 'capitalize'}}>{category.name}</Link>

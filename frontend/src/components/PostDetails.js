@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Icon, Button } from 'antd'
+import { Button, notification } from 'antd'
 import { connect } from 'react-redux'
 import {
   fetchComments,
@@ -46,15 +46,26 @@ class PostDetails extends Component {
     const { addComment } = this.props
     const id = generateId()
     const timestamp = new Date().getTime()
-    addComment(id, timestamp, message, author, this.props.match.params.post_id).then(() => (
-      this.setState({
-        id: '',
-        timestamp: new Date().getTime(),
-        author: '',
-        message: '',
-        parent_id: ''
-      })
-    ))
+    if (message !== '' && author !== '') {
+      addComment(id, timestamp, message, author, this.props.match.params.post_id).then(() => (
+        this.setState({
+          id: '',
+          timestamp: new Date().getTime(),
+          author: '',
+          message: '',
+          parent_id: ''
+        })
+      ))
+      notification['success']({
+        message: 'Success!',
+        description: 'Comment created!',
+      });
+    } else {
+      notification['error']({
+        message: 'Error!',
+        description: 'You need to fill all the fields',
+      });
+    }
   }
 
   handleEdit = (e, commentId) => {
@@ -71,29 +82,48 @@ class PostDetails extends Component {
 
   handleUpdate = (e) => {
     e.preventDefault()
-    const {formNormal} = this.props
-    formNormal()
-    this.setState({
-      timestamp: new Date().getTime(),
-    })
     const { id, timestamp, message } = this.state
-    const { editComment } = this.props
-    editComment(id, timestamp, message)
-    this.setState({
-      message: ''
-    })
+    const { editComment, formNormal } = this.props
+    if (message !== '') {
+      formNormal()
+      this.setState({
+        timestamp: new Date().getTime(),
+      })
+      editComment(id, timestamp, message)
+      this.setState({
+        message: ''
+      })
+      notification['success']({
+        message: 'Success!',
+        description: "Comment updated",
+      });
+    } else {
+      notification['error']({
+        message: 'Error!',
+        description: "Your comment can't be blank",
+      });
+    }
+
   }
 
   handleDelete = (e, id) => {
     const { removeComment } = this.props
     e.preventDefault()
     removeComment(id)
+    notification['info']({
+      message: 'Deleted!',
+      description: 'Comment deleted!',
+    });
   }
 
   handleDeletePost = (id) => {
     const { history, deletePost } = this.props
     deletePost(id)
     history.push('/')
+    notification['info']({
+      message: 'Deleted!',
+      description: 'Post deleted!',
+    });
   }
 
   handleChange = (e, dest, cont) => {
@@ -108,6 +138,11 @@ class PostDetails extends Component {
     const commentsNumber = forum.comments.length
     return (
       <div>
+        <div style={{margin: '2em 0', display: 'flex', width: '100%', alignItems: 'flex-start', justifyContent: 'flex-start'}}>
+          <Link to={`/${match.params.category}`}>
+            <Button type="primary" icon="left">To category</Button>
+          </Link>
+        </div>
         <div>
           Arrange Comments by:
           <Button style={{margin: '1em'}} icon="like-o" onClick={(postId) => arrangeByScore(match.params.post_id)}>Score</Button>
@@ -124,11 +159,9 @@ class PostDetails extends Component {
             </div>
             <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', flex: 1}}>
               <Link style={{margin: '0.5em 0'}} to={`/${detail.category}/${detail.id}/edit_post`}>
-                <Icon type="edit" style={{ fontSize: 24, color: '#bbb' }}/>
+                <Button style={{margin: '0.5em 0'}} shape="circle" icon="edit" type="primary" />
               </Link>
-              <button style={{margin: '0.5em 0'}} onClick={() => this.handleDeletePost(detail.id)}>
-                <Icon type="delete" style={{ fontSize: 24, color: '#bbb' }}/>
-              </button>
+              <Button style={{margin: '0.5em 0'}} shape="circle" icon="delete" type="danger" onClick={() => this.handleDeletePost(detail.id)} />
             </div>
           </div>
         ))}

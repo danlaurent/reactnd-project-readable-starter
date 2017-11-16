@@ -1,6 +1,6 @@
 import React from 'react'
 import VoteControls from './VoteControls'
-import { Icon } from 'antd'
+import { Button } from 'antd'
 import { connect } from 'react-redux'
 import { convertTimestamp } from '../utils/Helpers'
 import { likeComment, dislikeComment } from '../actions'
@@ -16,12 +16,8 @@ const Comment = ({comment, forum, like, dislike, handleDelete, handleEdit}) => (
           <p style={{fontSize: '1.5em'}}>{comment.body}</p>
         </div>
         <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
-          <button style={{margin: '0.5em 0'}} onClick={(e) => handleEdit(e, comment.id)}>
-            <Icon type="edit" style={{ fontSize: 24, color: '#bbb' }}/>
-          </button>
-          <button style={{margin: '0.5em 0'}} onClick={(e) => handleDelete(e, comment.id)}>
-            <Icon type="delete" style={{ fontSize: 24, color: '#bbb' }}/>
-          </button>
+          <Button style={{margin: '0.5em 0'}} shape="circle" icon="edit" type="primary" onClick={(e) => handleEdit(e, comment.id)} />
+          <Button style={{margin: '0.5em 0'}} shape="circle" icon="delete" type="danger" onClick={(e) => handleDelete(e, comment.id)} />
         </div>
       </div>
     ))}

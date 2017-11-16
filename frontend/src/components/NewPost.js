@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Form, Input, Select, Button } from 'antd'
+import { Form, Input, Select, Button, notification } from 'antd'
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { newPost, updatePost, formPostNormal, formPostEdit } from '../actions'
 import * as ReadableAPI from '../utils/ReadableAPI'
@@ -39,22 +40,44 @@ class NewPost extends Component {
     const { addPost, history } = this.props
     const id = generateId()
     const timestamp = new Date().getTime()
-    addPost(id, timestamp, title, message, author, post_category)
-    history.push('/')
+    if (title !== '' && message !== '' && author !== '' && post_category !== '') {
+      addPost(id, timestamp, title, message, author, post_category)
+      history.push('/')
+      notification['success']({
+        message: 'Post created!',
+        description: `Post "${title}" succesfully created!`,
+      });
+    } else {
+      notification['error']({
+        message: 'Error!',
+        description: 'You need to fill all the fields',
+      });
+    }
   }
 
   handleUpdate = (e) => {
     e.preventDefault()
     const { id, title, message } = this.state
     const { updatePost, history, formNormal, match } = this.props
-    updatePost(id, title, message)
-    formNormal()
-    this.setState({
-      id: '',
-      title: '',
-      message: ''
-    })
-    history.push(`/${match.params.category}/${match.params.id}`)
+    if (title !== '' && message !== '') {
+      updatePost(id, title, message)
+      formNormal()
+      this.setState({
+        id: '',
+        title: '',
+        message: ''
+      })
+      history.push(`/${match.params.category}/${match.params.id}`)
+      notification['success']({
+        message: 'Success!',
+        description: `Post updated!`,
+      });
+    } else {
+      notification['error']({
+        message: 'Error!',
+        description: 'You need to fill all the fields',
+      });
+    }
   }
 
   handleChange = (e, dest, cont) => {
@@ -73,6 +96,11 @@ class NewPost extends Component {
     }
     return (
       <div style={{margin: '2em 0'}}>
+        <div style={{margin: '2em 0', display: 'flex', width: '100%', alignItems: 'flex-start', justifyContent: 'flex-start'}}>
+          <Link to="/">
+            <Button type="primary" icon="left">To Home</Button>
+          </Link>
+        </div>
         {editMode
           ? (
             <Form>

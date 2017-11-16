@@ -90,7 +90,7 @@ const forum = (state = initialReadableState, action) => {
             post = votedPost
           }
           return post
-        })
+        }).sort((a, b) => a.voteScore < b.voteScore)
       }
     case VOTE_COMMENT:
       return {
@@ -100,7 +100,7 @@ const forum = (state = initialReadableState, action) => {
             comment = votedComment
           }
           return comment
-        })
+        }).sort((a, b) => a.voteScore < b.voteScore)
       }
     case DELETE_POST:
       return {
