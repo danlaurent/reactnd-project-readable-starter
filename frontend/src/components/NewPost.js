@@ -3,7 +3,6 @@ import { Form, Input, Select, Button, notification } from 'antd'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { newPost, updatePost, formPostNormal, formPostEdit } from '../actions'
-import * as ReadableAPI from '../utils/ReadableAPI'
 import { generateId } from '../utils/Helpers'
 
 class NewPost extends Component {
@@ -21,10 +20,10 @@ class NewPost extends Component {
   }
 
   componentDidMount() {
-    const { match, formUpdate } = this.props
+    const { match, formUpdate, forum } = this.props
     if (match) {
       formUpdate()
-      ReadableAPI.getPost(match.params.id).then(post => (
+      forum.posts.filter(p => p.id === match.params.id).map(post => (
         this.setState({
           id: post.id,
           title: post.title,

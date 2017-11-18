@@ -15,7 +15,6 @@ import {
   formCommentNormal,
   formCommentUpdate
 } from '../actions'
-import * as ReadableAPI from '../utils/ReadableAPI'
 import { convertTimestamp } from '../utils/Helpers'
 import NewComment from './NewComment'
 import Comment from './Comment'
@@ -69,10 +68,10 @@ class PostDetails extends Component {
   }
 
   handleEdit = (e, commentId) => {
-    const {formUpdate} = this.props
+    const {formUpdate, comments} = this.props
     e.preventDefault()
     formUpdate()
-    ReadableAPI.getComment(commentId).then(comment => (
+    comments.filter(c => c.id === commentId).map(comment => (
       this.setState({
         id: comment.id,
         message: comment.body
