@@ -142,11 +142,13 @@ class PostDetails extends Component {
             <Button type="primary" icon="left">To category</Button>
           </Link>
         </div>
-        <div>
-          Arrange Comments by:
-          <Button style={{margin: '1em'}} icon="like-o" onClick={(postId) => arrangeByScore(match.params.post_id)}>Score</Button>
-          <Button style={{marginLeft: '0 0.5em'}} icon="calendar" onClick={(postId) => arrangeByDate(match.params.post_id)}>Date</Button>
-        </div>
+        {comments.length > 1 && details.length > 0 && (
+          <div>
+            Arrange Comments by:
+            <Button style={{margin: '1em'}} icon="like-o" onClick={(postId) => arrangeByScore(match.params.post_id)}>Score</Button>
+            <Button style={{marginLeft: '0 0.5em'}} icon="calendar" onClick={(postId) => arrangeByDate(match.params.post_id)}>Date</Button>
+          </div>
+        )}
         {details.map(detail => (
           <div key={detail.id} style={{ background: '#fff', padding: 24, minHeight: 80, marginTop: 24, display: 'flex'}}>
             <VoteControls target={detail} like={like} dislike={dislike} />
@@ -165,7 +167,7 @@ class PostDetails extends Component {
           </div>
         ))}
         <hr />
-        {comments.map(comment => (
+        {details.length > 0 && comments.map(comment => (
           <Comment
             comment={comment}
             key={comment.id}
@@ -173,14 +175,16 @@ class PostDetails extends Component {
             handleDelete={this.handleDelete}
           />
         ))}
-        <NewComment
-          match={match}
-          handleChange={this.handleChange}
-          handleSubmit={this.handleSubmit}
-          handleUpdate={this.handleUpdate}
-          authorName={this.state.author}
-          bodyContent={this.state.message}
+        {details.length > 0 && (
+          <NewComment
+            match={match}
+            handleChange={this.handleChange}
+            handleSubmit={this.handleSubmit}
+            handleUpdate={this.handleUpdate}
+            authorName={this.state.author}
+            bodyContent={this.state.message}
           />
+        )}
       </div>
     )
   }
