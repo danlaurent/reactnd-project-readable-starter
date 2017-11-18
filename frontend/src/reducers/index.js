@@ -2,6 +2,7 @@ import {
   GET_CATEGORIES,
   GET_POSTS,
   GET_COMMENTS,
+  GET_ALL_COMMENTS,
   CREATE_POST,
   EDIT_POST,
   VOTE_POST,
@@ -24,12 +25,13 @@ import { combineReducers } from 'redux'
 const initialReadableState = {
   categories: [],
   posts: [],
-  comments: []
+  comments: [],
+  allComments: {}
 }
 
 
 const forum = (state = initialReadableState, action) => {
-  const {id, timestamp, title, body, author, category, posts, post, votedPost, votedComment, comments, parentId, data} = action
+  const {id, timestamp, title, body, author, category, posts, post, votedPost, votedComment, comments, postId, parentId, data} = action
   switch (action.type) {
     case GET_CATEGORIES:
       return {
@@ -45,6 +47,14 @@ const forum = (state = initialReadableState, action) => {
       return {
         ...state,
         comments
+      }
+    case GET_ALL_COMMENTS:
+      return {
+        ...state,
+        allComments: {
+          ...state.allComments,
+          [postId]: comments
+        }
       }
     case CREATE_COMMENT:
       return {

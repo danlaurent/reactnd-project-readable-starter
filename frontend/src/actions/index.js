@@ -3,6 +3,7 @@ import * as ReadableAPI from '../utils/ReadableAPI'
 export const GET_CATEGORIES = 'GET_CATEGORIES'
 export const GET_POSTS = 'GET_POSTS'
 export const GET_COMMENTS = 'GET_COMMENTS'
+export const GET_ALL_COMMENTS = 'GET_ALL_COMMENTS'
 
 export const POSTS_BY_DATE = 'POSTS_BY_DATE'
 export const POSTS_BY_SCORE = 'POSTS_BY_SCORE'
@@ -64,9 +65,23 @@ export function receiveComments(comments) {
   }
 }
 
+export function receiveAllComments(comments, postId) {
+  return {
+    type: GET_ALL_COMMENTS,
+    comments,
+    postId
+  }
+}
+
 export const fetchComments = (postId) => dispatch => (
   ReadableAPI.getPostComments(postId).then(comments => (
     dispatch(receiveComments(comments))
+  ))
+)
+
+export const fetchAllComments = (postId) => dispatch => (
+  ReadableAPI.getPostComments(postId).then(comments => (
+    dispatch(receiveAllComments(comments, postId))
   ))
 )
 
